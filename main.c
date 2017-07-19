@@ -10,7 +10,20 @@
 
 static void init(void);
 
-#define MIN_VOLTAGE 10500                       // min voltage for connected bat type [mV]
+#define AKKU_TYPE_NIMH
+#define AKKU_TYPE_LEAD
+
+
+#if defined(AKKU_TYPE_NIMH) && defined(AKKU_TYPE_LEAD)
+    #error nope
+#endif
+
+#if defined(AKKU_TYPE_LEAD)
+#define MIN_VOLTAGE 10500                       // min voltage for lead-gel batteries [mV]
+#endif
+#if defined(AKKU_TYPE_NIMH)
+#define MIN_VOLTAGE 8000                        // min voltage for 8-cell NIMH batteries [mV]
+#endif
 
 typedef struct {
     uint16_t bat_voltage;
@@ -30,7 +43,9 @@ int main(void){
     init();
 
     while(1) {
-        _delay_ms(1000);
+        for (int i = 0; i < 100; i++) {
+            _delay_ms(10);
+        }
         state.bat_voltage = adc_get_bat_voltage();
         if (state.bat_voltage < MIN_VOLTAGE) {
             //shutdown
